@@ -1,11 +1,9 @@
 """Admin-only endpoints for user and meta management."""
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
+from gather_your_deals.http import HttpTransport
 from gather_your_deals.models import User
-
-if TYPE_CHECKING:
-    from gather_your_deals.http import HttpTransport
 
 
 class AdminEndpoint:

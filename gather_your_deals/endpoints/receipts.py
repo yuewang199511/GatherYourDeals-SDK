@@ -1,11 +1,9 @@
 """Receipt (purchase record) endpoints."""
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 
+from gather_your_deals.http import HttpTransport
 from gather_your_deals.models import Receipt
-
-if TYPE_CHECKING:
-    from gather_your_deals.http import HttpTransport
 
 
 class ReceiptsEndpoint:

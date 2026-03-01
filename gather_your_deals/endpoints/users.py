@@ -1,11 +1,7 @@
 """User registration endpoint."""
 
-from typing import TYPE_CHECKING
-
+from gather_your_deals.http import HttpTransport
 from gather_your_deals.models import User
-
-if TYPE_CHECKING:
-    from gather_your_deals.http import HttpTransport
 
 
 class UsersEndpoint:
