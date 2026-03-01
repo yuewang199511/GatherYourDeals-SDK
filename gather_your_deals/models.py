@@ -6,7 +6,7 @@ and converted back via :meth:`to_dict`.
 """
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Self
 
 
 @dataclass
@@ -23,7 +23,7 @@ class User:
     role: str
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> User:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         """Create a :class:`User` from an API response dict."""
         return cls(
             id=data["id"],
@@ -50,7 +50,7 @@ class TokenResponse:
     token_type: str = "Bearer"
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> TokenResponse:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         """Create a :class:`TokenResponse` from an API response dict."""
         return cls(
             access_token=data["access_token"],
@@ -83,7 +83,7 @@ class MetaField:
     native: bool = False
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> MetaField:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         """Create a :class:`MetaField` from an API response dict."""
         return cls(
             field_name=data["fieldName"],
@@ -150,7 +150,7 @@ class Receipt:
     )
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> Receipt:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         """Create a :class:`Receipt` from an API response dict.
 
         Any keys that are not native fields are placed into
