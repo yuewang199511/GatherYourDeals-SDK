@@ -233,7 +233,8 @@ class TestReceipts:
     @responses.activate
     def test_delete_receipt(self, authed_client: GYDClient):
         responses.delete(
-            f"{BASE}/receipts/r-123", json={"message": "receipt deleted"}
+            f"{BASE}/receipts/r-123",
+            json={"message": "receipt deleted"},
         )
         result = authed_client.receipts.delete("r-123")
         assert result["message"] == "receipt deleted"
@@ -259,7 +260,8 @@ class TestAdmin:
     @responses.activate
     def test_delete_user(self, authed_client: GYDClient):
         responses.delete(
-            f"{BASE}/users/u-2", json={"message": "user deleted"}
+            f"{BASE}/users/u-2",
+            json={"message": "user deleted"},
         )
         result = authed_client.admin.delete_user("u-2")
         assert result["message"] == "user deleted"

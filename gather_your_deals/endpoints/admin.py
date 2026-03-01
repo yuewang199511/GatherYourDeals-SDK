@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 from gather_your_deals.models import User
 
@@ -42,12 +42,14 @@ class AdminEndpoint:
         :raises NotFoundError: If the user does not exist.
         :raises AuthenticationError: If not authenticated.
         """
-        return cast(dict[str, Any], self._t.request("DELETE", f"/users/{user_id}"))
+        return self._t.request("DELETE", f"/users/{user_id}")
 
     # ── Meta management ──────────────────────────────────────────────
 
     def update_field_description(
-        self, field_name: str, description: str
+        self,
+        field_name: str,
+        description: str,
     ) -> dict[str, Any]:
         """Update the description of an existing field.
 
@@ -61,11 +63,8 @@ class AdminEndpoint:
         :raises ValidationError: If the description is missing.
         :raises AuthenticationError: If not authenticated.
         """
-        return cast(
-            dict[str, Any],
-            self._t.request(
-                "PUT",
-                f"/meta/{field_name}",
-                json={"description": description},
-            ),
+        return self._t.request(
+            "PUT",
+            f"/meta/{field_name}",
+            json={"description": description},
         )

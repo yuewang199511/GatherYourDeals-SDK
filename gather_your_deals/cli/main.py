@@ -22,6 +22,7 @@ def _get_client() -> GYDClient:
 
 # ── Root group ───────────────────────────────────────────────────────────
 
+
 @click.group()
 @click.version_option(package_name="gather-your-deals")
 def cli() -> None:
@@ -29,6 +30,7 @@ def cli() -> None:
 
 
 # ── Config ───────────────────────────────────────────────────────────────
+
 
 @cli.command()
 @click.argument("base_url")
@@ -45,10 +47,15 @@ def config(base_url: str) -> None:
 
 # ── Auth ─────────────────────────────────────────────────────────────────
 
+
 @cli.command()
 @click.option("--username", "-u", prompt=True, help="Account username.")
 @click.option(
-    "--password", "-p", prompt=True, hide_input=True, help="Account password."
+    "--password",
+    "-p",
+    prompt=True,
+    hide_input=True,
+    help="Account password.",
 )
 def login(username: str, password: str) -> None:
     """Log in and store the access token locally.
@@ -91,11 +98,16 @@ def me() -> None:
 
 # ── User registration ───────────────────────────────────────────────────
 
+
 @cli.command()
 @click.option("--username", "-u", prompt=True, help="Desired username.")
 @click.option(
-    "--password", "-p", prompt=True, hide_input=True, confirmation_prompt=True,
-    help="Password (min 8 characters)."
+    "--password",
+    "-p",
+    prompt=True,
+    hide_input=True,
+    confirmation_prompt=True,
+    help="Password (min 8 characters).",
 )
 def register(username: str, password: str) -> None:
     """Register a new user account."""
@@ -109,6 +121,7 @@ def register(username: str, password: str) -> None:
 
 
 # ── Meta fields ──────────────────────────────────────────────────────────
+
 
 @cli.group()
 def meta() -> None:
@@ -145,6 +158,7 @@ def meta_add(field_name: str, description: str, field_type: str) -> None:
 
 
 # ── Receipts ─────────────────────────────────────────────────────────────
+
 
 @cli.group()
 def receipts() -> None:
@@ -192,8 +206,10 @@ def receipts_get(receipt_id: str) -> None:
 @click.option("--lat", type=float, default=None, help="Latitude.")
 @click.option("--lon", type=float, default=None, help="Longitude.")
 @click.option(
-    "--extra", "-e", multiple=True,
-    help="Extra field as key=value. Repeat for multiple."
+    "--extra",
+    "-e",
+    multiple=True,
+    help="Extra field as key=value. Repeat for multiple.",
 )
 def receipts_add(
     product_name: str,
@@ -248,6 +264,7 @@ def receipts_delete(receipt_id: str) -> None:
 
 # ── Batch import ─────────────────────────────────────────────────────────
 
+
 @receipts.command("import")
 @click.argument("file", type=click.Path(exists=True))
 def receipts_import(file: str) -> None:
@@ -283,6 +300,7 @@ def receipts_import(file: str) -> None:
 
 
 # ── Admin ────────────────────────────────────────────────────────────────
+
 
 @cli.group()
 def admin() -> None:

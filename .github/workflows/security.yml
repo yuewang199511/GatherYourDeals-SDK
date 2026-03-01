@@ -30,6 +30,9 @@ jobs:
           path: .venv
           key: venv-audit-${{ runner.os }}-3.12-${{ hashFiles('pyproject.toml') }}
 
+      - name: Install export plugin
+        run: poetry self add poetry-plugin-export
+
       - name: Install dependencies
         run: poetry install --with dev
 
