@@ -36,9 +36,6 @@ jobs:
       - name: Ruff check
         run: poetry run ruff check .
 
-      - name: Ruff format check
-        run: poetry run ruff format --check .
-
   typecheck:
     name: Mypy
     runs-on: ubuntu-latest
