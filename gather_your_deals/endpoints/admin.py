@@ -42,7 +42,8 @@ class AdminEndpoint:
         :raises NotFoundError: If the user does not exist.
         :raises AuthenticationError: If not authenticated.
         """
-        return self._t.request("DELETE", f"/users/{user_id}")
+        result: dict[str, Any] = self._t.request("DELETE", f"/users/{user_id}")
+        return result
 
     # ── Meta management ──────────────────────────────────────────────
 
@@ -63,8 +64,9 @@ class AdminEndpoint:
         :raises ValidationError: If the description is missing.
         :raises AuthenticationError: If not authenticated.
         """
-        return self._t.request(
+        result: dict[str, Any] = self._t.request(
             "PUT",
             f"/meta/{field_name}",
             json={"description": description},
         )
+        return result
