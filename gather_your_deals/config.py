@@ -3,8 +3,6 @@
 Reads and writes settings from ``~/.GYD_SDK/env.yaml``.
 """
 
-from __future__ import annotations
-
 from pathlib import Path
 from typing import Any
 

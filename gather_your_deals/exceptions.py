@@ -1,7 +1,5 @@
 """Custom exceptions for the GatherYourDeals SDK."""
 
-from __future__ import annotations
-
 from typing import Any
 
 

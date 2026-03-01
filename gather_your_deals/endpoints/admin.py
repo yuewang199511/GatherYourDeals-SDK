@@ -1,7 +1,5 @@
 """Admin-only endpoints for user and meta management."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Any
 
 from gather_your_deals.models import User

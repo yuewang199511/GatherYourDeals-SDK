@@ -24,8 +24,6 @@ Typical usage::
         print(r.product_name, r.price)
 """
 
-from __future__ import annotations
-
 from pathlib import Path
 from typing import Any
 

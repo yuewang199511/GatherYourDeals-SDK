@@ -1,7 +1,5 @@
 """User registration endpoint."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 from gather_your_deals.models import User

@@ -5,8 +5,6 @@ They can be created from API response dicts via :meth:`from_dict`
 and converted back via :meth:`to_dict`.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from typing import Any
 

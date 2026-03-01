@@ -1,7 +1,5 @@
 """Authentication and session endpoints."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Any, cast
 
 from gather_your_deals.models import TokenResponse

@@ -4,8 +4,6 @@ This module is internal.  Users should interact with
 :class:`gather_your_deals.client.GYDClient` instead.
 """
 
-from __future__ import annotations
-
 from typing import Any
 
 import requests

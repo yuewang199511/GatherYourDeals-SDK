@@ -3,8 +3,6 @@
 Run ``gatherYourDeals --help`` to see available commands.
 """
 
-from __future__ import annotations
-
 import json
 import sys
 
