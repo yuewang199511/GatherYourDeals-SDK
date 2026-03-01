@@ -1,0 +1,69 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  dependency-audit:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-audit-${{ runner.os }}-3.12-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Export requirements
+        run: poetry export -f requirements.txt --without-hashes -o requirements.txt
+
+      - name: Pip-audit
+        run: poetry run pip-audit -r requirements.txt
+
+  static-analysis:
+    name: Static Security Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-bandit-${{ runner.os }}-3.12-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Bandit
+        run: poetry run bandit -r gather_your_deals -c pyproject.toml
