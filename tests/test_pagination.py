@@ -6,7 +6,6 @@ import pytest
 import responses
 
 from gather_your_deals.client import GYDClient
-from gather_your_deals.pagination import PageIterator
 
 BASE = "http://localhost:8080/api/v1"
 

@@ -5,7 +5,8 @@ fetches paginated results from the API one page at a time, yielding
 individual items.
 """
 
-from typing import Any, Callable, Generic, Iterator, TypeVar
+from collections.abc import Callable, Iterator
+from typing import Any, Generic, TypeVar
 
 from gather_your_deals.http import HttpTransport
 

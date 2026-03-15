@@ -5,13 +5,15 @@ Run ``gatherYourDeals --help`` to see available commands.
 
 import json
 import sys
+from collections.abc import Callable
+from typing import Any
 
 import click
 
 from gather_your_deals.client import GYDClient
 from gather_your_deals.config import load_config, save_config
 from gather_your_deals.exceptions import GYDError
-
+from gather_your_deals.pagination import PageIterator
 
 _CLI_PAGE_SIZE = 20
 """Number of records to display before prompting the user."""
@@ -22,7 +24,7 @@ def _get_client() -> GYDClient:
     return GYDClient()
 
 
-def _paged_echo(page_iter, formatter, noun: str) -> None:
+def _paged_echo(page_iter: PageIterator[Any], formatter: Callable[[Any], str], noun: str) -> None:
     """Print items from *page_iter* in pages of :data:`_CLI_PAGE_SIZE`.
 
     After each page the user is prompted to press Enter for more.
