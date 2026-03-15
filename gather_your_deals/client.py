@@ -19,7 +19,7 @@ Typical usage::
         store_name="Costco",
     )
 
-    # List receipts
+    # List receipts (lazy iterator, fetches pages of 50)
     for r in client.receipts.list():
         print(r.product_name, r.price)
 """

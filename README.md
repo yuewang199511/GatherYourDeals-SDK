@@ -34,8 +34,15 @@ receipt = client.receipts.create(
     store_name="Costco",
 )
 
+# List receipts — returns a lazy PageIterator (fetches pages of 50)
 for r in client.receipts.list():
     print(r.product_name, r.price)
+
+# Sort and access pagination metadata
+page_iter = client.receipts.list(sort_by="price", sort_order="asc")
+for r in page_iter:
+    print(r.product_name, r.price)
+print(f"{page_iter.total} receipts total")
 ```
 
 ```bash

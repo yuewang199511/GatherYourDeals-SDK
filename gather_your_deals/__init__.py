@@ -7,7 +7,7 @@ Quick start::
     client = GYDClient("http://localhost:8080/api/v1")
     client.login("alice", "password123")
 
-    for receipt in client.receipts.list():
+    for receipt in client.receipts.list():  # lazy, fetches pages of 50
         print(receipt.product_name, receipt.price)
 """
 
@@ -27,6 +27,7 @@ from gather_your_deals.exceptions import (
     ValidationError,
 )
 from gather_your_deals.models import MetaField, Receipt, TokenResponse, User
+from gather_your_deals.pagination import PageIterator
 
 __all__ = [
     "__version__",
@@ -36,6 +37,8 @@ __all__ = [
     "TokenResponse",
     "MetaField",
     "Receipt",
+    # Pagination
+    "PageIterator",
     # Exceptions
     "GYDError",
     "AuthenticationError",

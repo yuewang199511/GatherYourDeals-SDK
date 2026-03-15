@@ -15,6 +15,13 @@ Models
    :members:
    :undoc-members:
 
+Pagination
+----------
+
+.. automodule:: gather_your_deals.pagination
+   :members:
+   :undoc-members:
+
 Exceptions
 ----------
 

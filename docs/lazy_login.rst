@@ -44,11 +44,13 @@ know a new ``login()`` call is needed.
    client = GYDClient()  # loads saved tokens
 
    try:
-       receipts = client.receipts.list()
+       for r in client.receipts.list():
+           print(r.product_name)
    except AuthenticationError:
        # Both tokens expired — prompt the user to log in again
        client.login("alice", "password123")
-       receipts = client.receipts.list()
+       for r in client.receipts.list():
+           print(r.product_name)
 
 Python flow
 -----------
@@ -61,7 +63,8 @@ endpoint method) is what actually reaches out to the server.
 .. code-block:: python
 
    client = GYDClient()          # no network call
-   client.receipts.list()        # token verified here
+   for r in client.receipts.list():   # token verified here
+       print(r.product_name)
 
 Refresh callback
 ----------------

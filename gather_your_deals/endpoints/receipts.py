@@ -4,6 +4,7 @@ from typing import Any, cast
 
 from gather_your_deals.http import HttpTransport
 from gather_your_deals.models import Receipt
+from gather_your_deals.pagination import PageIterator
 
 
 class ReceiptsEndpoint:
@@ -78,16 +79,29 @@ class ReceiptsEndpoint:
         data = self._t.request("POST", "/receipts", json=body)
         return Receipt.from_dict(data)
 
-    def list(self) -> list[Receipt]:
+    def list(
+        self,
+        *,
+        sort_by: str = "created_at",
+        sort_order: str = "desc",
+    ) -> PageIterator[Receipt]:
         """List all receipts belonging to the authenticated user.
 
-        Results are ordered newest first.
+        Returns a lazy iterator that fetches pages of 50 items on demand.
 
-        :returns: List of :class:`~gather_your_deals.models.Receipt`.
+        :param sort_by: Field to sort by.  Allowed values:
+            ``created_at``, ``purchase_date``, ``price``,
+            ``store_name``, ``product_name``.
+        :param sort_order: Sort direction — ``"asc"`` or ``"desc"``.
+        :returns: A :class:`~gather_your_deals.pagination.PageIterator`
+            yielding :class:`~gather_your_deals.models.Receipt` instances.
         :raises AuthenticationError: If not authenticated.
         """
-        data = self._t.request("GET", "/receipts")
-        return [Receipt.from_dict(item) for item in data]
+        params: dict[str, Any] = {
+            "sort_by": sort_by,
+            "sort_order": sort_order,
+        }
+        return PageIterator(self._t, "/receipts", params, Receipt.from_dict)
 
     def get(self, receipt_id: str) -> Receipt:
         """Get a single receipt by ID.

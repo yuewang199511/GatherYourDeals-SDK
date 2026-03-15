@@ -1,0 +1,23 @@
+name: Auto-merge
+
+on:
+  pull_request:
+    branches: [main]
+
+# Only needed for Dependabot or bot PRs.
+# Remove the 'if' line below to auto-merge ALL PRs once CI passes.
+
+jobs:
+  automerge:
+    name: Enable auto-merge
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Enable auto-merge (squash)
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

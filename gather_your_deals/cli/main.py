@@ -5,17 +5,57 @@ Run ``gatherYourDeals --help`` to see available commands.
 
 import json
 import sys
+from collections.abc import Callable
+from typing import Any
 
 import click
 
 from gather_your_deals.client import GYDClient
 from gather_your_deals.config import load_config, save_config
 from gather_your_deals.exceptions import GYDError
+from gather_your_deals.pagination import PageIterator
+
+_CLI_PAGE_SIZE = 20
+"""Number of records to display before prompting the user."""
 
 
 def _get_client() -> GYDClient:
     """Create a client using the stored configuration."""
     return GYDClient()
+
+
+def _paged_echo(page_iter: PageIterator[Any], formatter: Callable[[Any], str], noun: str) -> None:
+    """Print items from *page_iter* in pages of :data:`_CLI_PAGE_SIZE`.
+
+    After each page the user is prompted to press Enter for more.
+    Ctrl+C exits early with a summary of how many items were shown.
+
+    :param page_iter: A :class:`PageIterator` instance.
+    :param formatter: Callable that takes an item and returns the
+        display string for that row.
+    :param noun: Label used in the summary line (e.g. ``"receipt"``).
+    """
+    count = 0
+    try:
+        for item in page_iter:
+            click.echo(formatter(item))
+            count += 1
+            if count % _CLI_PAGE_SIZE == 0:
+                # We know total after the first page has been fetched
+                remaining = (page_iter.total or 0) - count
+                if remaining > 0:
+                    click.echo(
+                        f"\n-- Showing {count} of {page_iter.total} {noun}(s). "
+                        "Press Enter for more, Ctrl+C to stop. --",
+                    )
+                    input()
+    except KeyboardInterrupt:
+        click.echo()  # newline after ^C
+
+    if count == 0:
+        click.echo(f"No {noun}s found.")
+    else:
+        click.echo(f"\n{count} of {page_iter.total} {noun}(s).")
 
 
 # ── Root group ───────────────────────────────────────────────────────────
@@ -131,10 +171,15 @@ def meta_list() -> None:
     """List all registered fields."""
     try:
         client = _get_client()
-        fields = client.meta.list()
-        for f in fields:
-            native = " [native]" if f.native else ""
-            click.echo(f"  {f.field_name} ({f.type}): {f.description}{native}")
+        page_iter = client.meta.list()
+        _paged_echo(
+            page_iter,
+            lambda f: (
+                f"  {f.field_name} ({f.type}): {f.description}"
+                f"{' [native]' if f.native else ''}"
+            ),
+            "field",
+        )
     except GYDError as exc:
         click.echo(f"Error: {exc}", err=True)
         sys.exit(1)
@@ -168,15 +213,15 @@ def receipts_list() -> None:
     """List all your receipts."""
     try:
         client = _get_client()
-        items = client.receipts.list()
-        if not items:
-            click.echo("No receipts found.")
-            return
-        for r in items:
-            click.echo(
+        page_iter = client.receipts.list()
+        _paged_echo(
+            page_iter,
+            lambda r: (
                 f"  [{r.id[:8]}] {r.purchase_date}  {r.product_name:30s}"
                 f"  {r.price:>10s}  @ {r.store_name}"
-            )
+            ),
+            "receipt",
+        )
     except GYDError as exc:
         click.echo(f"Error: {exc}", err=True)
         sys.exit(1)
@@ -310,9 +355,12 @@ def admin_list_users() -> None:
     """List all users (admin only)."""
     try:
         client = _get_client()
-        users = client.admin.list_users()
-        for u in users:
-            click.echo(f"  {u.id}  {u.username:20s}  role={u.role}")
+        page_iter = client.admin.list_users()
+        _paged_echo(
+            page_iter,
+            lambda u: f"  {u.id}  {u.username:20s}  role={u.role}",
+            "user",
+        )
     except GYDError as exc:
         click.echo(f"Error: {exc}", err=True)
         sys.exit(1)
