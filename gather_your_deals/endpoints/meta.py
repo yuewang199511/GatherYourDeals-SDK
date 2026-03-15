@@ -1,7 +1,10 @@
 """Field metadata endpoints."""
 
+from typing import Any
+
 from gather_your_deals.http import HttpTransport
 from gather_your_deals.models import MetaField
+from gather_your_deals.pagination import PageIterator
 
 
 class MetaEndpoint:
@@ -15,14 +18,27 @@ class MetaEndpoint:
     def __init__(self, transport: HttpTransport):
         self._t = transport
 
-    def list(self) -> list[MetaField]:
+    def list(
+        self,
+        *,
+        sort_by: str = "name",
+        sort_order: str = "asc",
+    ) -> PageIterator[MetaField]:
         """List all registered fields (native and user-defined).
 
-        :returns: List of :class:`~gather_your_deals.models.MetaField`.
+        Returns a lazy iterator that fetches pages of 50 items on demand.
+
+        :param sort_by: Field to sort by.  Allowed values: ``name``.
+        :param sort_order: Sort direction — ``"asc"`` or ``"desc"``.
+        :returns: A :class:`~gather_your_deals.pagination.PageIterator`
+            yielding :class:`~gather_your_deals.models.MetaField` instances.
         :raises AuthenticationError: If not authenticated.
         """
-        data = self._t.request("GET", "/meta")
-        return [MetaField.from_dict(item) for item in data]
+        params: dict[str, Any] = {
+            "sort_by": sort_by,
+            "sort_order": sort_order,
+        }
+        return PageIterator(self._t, "/meta", params, MetaField.from_dict)
 
     def register(self, field_name: str, description: str, field_type: str) -> MetaField:
         """Register a new user-defined field.

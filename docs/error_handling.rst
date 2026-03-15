@@ -103,7 +103,8 @@ Usage examples
    client = GYDClient()
 
    try:
-       client.receipts.list()
+       for r in client.receipts.list():
+           print(r.product_name)
    except GYDError as e:
        print(f"API error ({e.status_code}): {e}")
 

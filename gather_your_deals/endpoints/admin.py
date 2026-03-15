@@ -4,6 +4,7 @@ from typing import Any
 
 from gather_your_deals.http import HttpTransport
 from gather_your_deals.models import User
+from gather_your_deals.pagination import PageIterator
 
 
 class AdminEndpoint:
@@ -19,15 +20,29 @@ class AdminEndpoint:
 
     # ── User management ──────────────────────────────────────────────
 
-    def list_users(self) -> list[User]:
+    def list_users(
+        self,
+        *,
+        sort_by: str = "created_at",
+        sort_order: str = "desc",
+    ) -> PageIterator[User]:
         """List all registered user accounts.
 
-        :returns: List of :class:`~gather_your_deals.models.User`.
+        Returns a lazy iterator that fetches pages of 50 items on demand.
+
+        :param sort_by: Field to sort by.  Allowed values:
+            ``created_at``, ``username``, ``role``.
+        :param sort_order: Sort direction — ``"asc"`` or ``"desc"``.
+        :returns: A :class:`~gather_your_deals.pagination.PageIterator`
+            yielding :class:`~gather_your_deals.models.User` instances.
         :raises AuthorizationError: If the caller is not an admin.
         :raises AuthenticationError: If not authenticated.
         """
-        data = self._t.request("GET", "/users")
-        return [User.from_dict(item) for item in data]
+        params: dict[str, Any] = {
+            "sort_by": sort_by,
+            "sort_order": sort_order,
+        }
+        return PageIterator(self._t, "/users", params, User.from_dict)
 
     def delete_user(self, user_id: str) -> dict[str, Any]:
         """Delete a user account and revoke all their refresh tokens.

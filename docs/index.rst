@@ -7,6 +7,7 @@ GatherYourDeals SDK Documentation
 
    installation
    quickstart
+   pagination
    token_storage
    lazy_login
    error_handling

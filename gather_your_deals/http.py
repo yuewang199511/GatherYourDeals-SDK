@@ -103,6 +103,7 @@ class HttpTransport:
         path: str,
         *,
         json: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
         authenticated: bool = True,
     ) -> Any:
         """Send an HTTP request to the API.
@@ -113,6 +114,7 @@ class HttpTransport:
         :param method: HTTP method (``GET``, ``POST``, ``PUT``, ``DELETE``).
         :param path: URL path relative to :attr:`base_url`.
         :param json: JSON request body.
+        :param params: URL query parameters.
         :param authenticated: Whether to include the ``Authorization`` header.
         :returns: Parsed JSON response.
         :raises ConnectionError: If the server cannot be reached.
@@ -124,6 +126,7 @@ class HttpTransport:
                 method,
                 url,
                 json=json,
+                params=params,
                 headers=self._headers(authenticated),
                 timeout=self.timeout,
             )
@@ -137,6 +140,7 @@ class HttpTransport:
                     method,
                     url,
                     json=json,
+                    params=params,
                     headers=self._headers(authenticated),
                     timeout=self.timeout,
                 )

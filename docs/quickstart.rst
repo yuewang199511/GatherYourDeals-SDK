@@ -34,9 +34,25 @@ Python
        extras={"brand": "Kirkland"},
    )
 
-   # List all your receipts
+   # List all your receipts — returns a lazy PageIterator
+   # that fetches pages of 50 items on demand
    for r in client.receipts.list():
        print(r.product_name, r.price, r.store_name)
+
+   # Custom sort order
+   for r in client.receipts.list(sort_by="price", sort_order="asc"):
+       print(r.product_name, r.price)
+
+   # Access pagination metadata after iterating
+   page_iter = client.receipts.list()
+   for r in page_iter:
+       pass
+   print(page_iter.total)        # total items on server
+   print(page_iter.total_pages)  # total number of pages
+
+   # Meta and admin lists also return PageIterators
+   for f in client.meta.list(sort_by="name", sort_order="desc"):
+       print(f.field_name, f.type)
 
    # Get a single receipt
    r = client.receipts.get(receipt.id)
@@ -81,7 +97,7 @@ CLI
        --lat 49.2827 --lon -123.1207 \
        -e brand=Kirkland
 
-   # List, get, delete
+   # List (shows 20 at a time — press Enter for more, Ctrl+C to stop)
    gatherYourDeals receipts list
    gatherYourDeals receipts get <receipt-id>
    gatherYourDeals receipts delete <receipt-id>

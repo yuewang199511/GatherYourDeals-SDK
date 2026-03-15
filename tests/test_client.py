@@ -114,26 +114,35 @@ class TestMeta:
     def test_list_fields(self, authed_client: GYDClient):
         responses.get(
             f"{BASE}/meta",
-            json=[
-                {
-                    "fieldName": "productName",
-                    "description": "name of product",
-                    "type": "string",
-                    "native": True,
-                },
-                {
-                    "fieldName": "brand",
-                    "description": "brand of the product",
-                    "type": "string",
-                    "native": False,
-                },
-            ],
+            json={
+                "data": [
+                    {
+                        "fieldName": "productName",
+                        "description": "name of product",
+                        "type": "string",
+                        "native": True,
+                    },
+                    {
+                        "fieldName": "brand",
+                        "description": "brand of the product",
+                        "type": "string",
+                        "native": False,
+                    },
+                ],
+                "total": 2,
+                "offset": 0,
+                "limit": 50,
+                "total_pages": 1,
+            },
         )
-        fields = authed_client.meta.list()
+        page_iter = authed_client.meta.list()
+        fields = list(page_iter)
         assert len(fields) == 2
         assert fields[0].field_name == "productName"
         assert fields[0].native is True
         assert fields[1].field_name == "brand"
+        assert page_iter.total == 2
+        assert page_iter.total_pages == 1
 
     @responses.activate
     def test_register_field(self, authed_client: GYDClient):
@@ -209,10 +218,21 @@ class TestReceipts:
 
     @responses.activate
     def test_list_receipts(self, authed_client: GYDClient):
-        responses.get(f"{BASE}/receipts", json=[SAMPLE_RECEIPT])
-        items = authed_client.receipts.list()
+        responses.get(
+            f"{BASE}/receipts",
+            json={
+                "data": [SAMPLE_RECEIPT],
+                "total": 1,
+                "offset": 0,
+                "limit": 50,
+                "total_pages": 1,
+            },
+        )
+        page_iter = authed_client.receipts.list()
+        items = list(page_iter)
         assert len(items) == 1
         assert items[0].product_name == "Milk 2%"
+        assert page_iter.total == 1
 
     @responses.activate
     def test_get_receipt(self, authed_client: GYDClient):
@@ -248,14 +268,22 @@ class TestAdmin:
     def test_list_users(self, authed_client: GYDClient):
         responses.get(
             f"{BASE}/users",
-            json=[
-                {"id": "u-1", "username": "alice", "role": "admin"},
-                {"id": "u-2", "username": "bob", "role": "user"},
-            ],
+            json={
+                "data": [
+                    {"id": "u-1", "username": "alice", "role": "admin"},
+                    {"id": "u-2", "username": "bob", "role": "user"},
+                ],
+                "total": 2,
+                "offset": 0,
+                "limit": 50,
+                "total_pages": 1,
+            },
         )
-        users = authed_client.admin.list_users()
+        page_iter = authed_client.admin.list_users()
+        users = list(page_iter)
         assert len(users) == 2
         assert users[0].username == "alice"
+        assert page_iter.total == 2
 
     @responses.activate
     def test_delete_user(self, authed_client: GYDClient):
@@ -300,7 +328,16 @@ class TestAutoRefresh:
             },
         )
         # Retry succeeds
-        responses.get(f"{BASE}/receipts", json=[SAMPLE_RECEIPT])
+        responses.get(
+            f"{BASE}/receipts",
+            json={
+                "data": [SAMPLE_RECEIPT],
+                "total": 1,
+                "offset": 0,
+                "limit": 50,
+                "total_pages": 1,
+            },
+        )
 
-        items = authed_client.receipts.list()
+        items = list(authed_client.receipts.list())
         assert len(items) == 1
