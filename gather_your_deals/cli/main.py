@@ -122,6 +122,35 @@ def logout() -> None:
         sys.exit(1)
 
 
+@cli.command("show-token")
+@click.option(
+    "--refresh",
+    "show_refresh",
+    is_flag=True,
+    default=False,
+    help="Also print the stored refresh token.",
+)
+def show_token(show_refresh: bool) -> None:
+    """Print the stored JWT access token.
+
+    Useful for passing the token to other services or tools::
+
+        export TOKEN=$(gatherYourDeals show-token)
+    """
+    cfg = load_config()
+    token = cfg.get("token")
+    if not token:
+        click.echo("No token stored. Run 'login' first.", err=True)
+        sys.exit(1)
+    click.echo(token)
+    if show_refresh:
+        refresh = cfg.get("refresh_token")
+        if refresh:
+            click.echo(refresh)
+        else:
+            click.echo("No refresh token stored.", err=True)
+
+
 @cli.command()
 def me() -> None:
     """Show current authenticated user info."""

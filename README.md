@@ -52,9 +52,55 @@ client.receipts.delete(receipt.id)
 
 ```bash
 # If installed via poetry, prefix with: poetry run
+
+# Set the API URL once (saved to ~/.GYD_SDK/env.yaml)
+gatherYourDeals config http://localhost:8080/api/v1
+
 gatherYourDeals login -u alice -p password123
 gatherYourDeals receipts list
 ```
+
+## Microservice Usage
+
+In a microservice you may already hold a user's JWT from an upstream auth step.
+Pass it directly to avoid logging in again:
+
+```python
+from gather_your_deals import GYDClient
+
+# Both tokens — recommended so the SDK can auto-refresh on expiry
+client = GYDClient(
+    "http://localhost:8080/api/v1",
+    access_token="eyJhbGci...",
+    refresh_token="abc123...",
+)
+
+# Access token only — works until the JWT expires
+client = GYDClient(
+    "http://localhost:8080/api/v1",
+    access_token="eyJhbGci...",
+)
+```
+
+Retrieve a stored token from the CLI to hand to another service:
+
+```bash
+# Print the stored access token
+gatherYourDeals show-token
+
+# Also print the refresh token
+gatherYourDeals show-token --refresh
+
+# Capture both for use in scripts or environment variables
+ACCESS=$(gatherYourDeals show-token)
+REFRESH=$(gatherYourDeals show-token --refresh | tail -1)
+```
+
+> **Why pass the refresh token too?**
+> Access tokens (JWTs) are short-lived (typically 15 min – 1 hour).
+> Without a refresh token the SDK cannot renew the session automatically
+> and will raise `AuthenticationError` once the token expires.
+> Pass both tokens for uninterrupted microservice operation.
 
 ## Documentation
 

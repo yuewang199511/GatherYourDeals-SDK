@@ -66,6 +66,27 @@ Python
    # Log out
    client.logout()
 
+Microservice / JWT initialisation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If your service already holds a user's JWT (e.g. extracted from an
+incoming request header), you can initialise the client directly without
+calling ``login()``::
+
+   client = GYDClient(
+       "http://localhost:8080/api/v1",
+       access_token="eyJhbGci...",   # JWT access token
+       refresh_token="abc123...",    # optional but recommended
+   )
+
+   for r in client.receipts.list():
+       print(r.product_name)
+
+When ``refresh_token`` is omitted the client will raise
+:py:class:`~gather_your_deals.exceptions.AuthenticationError` once the
+access token expires.  Pass both tokens so the SDK can renew the session
+transparently.  See :doc:`token_storage` for a full discussion.
+
 CLI
 ---
 
@@ -109,6 +130,10 @@ CLI
    gatherYourDeals admin users
    gatherYourDeals admin delete-user <user-id>
    gatherYourDeals admin update-field brand "brand or manufacturer"
+
+   # Show the stored JWT (useful for passing to another service)
+   gatherYourDeals show-token           # prints the access token
+   gatherYourDeals show-token --refresh # also prints the refresh token
 
    # Log out
    gatherYourDeals logout

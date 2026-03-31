@@ -25,8 +25,30 @@ class GYDError(Exception):
 class AuthenticationError(GYDError):
     """Raised when authentication fails (401).
 
-    This includes invalid credentials, expired tokens,
-    or missing authorization headers.
+    Prefer the more specific subclasses when you need to distinguish
+    the cause:
+
+    * :class:`NotAuthenticatedError` — no token was present at all.
+    * :class:`TokenExpiredError` — a token was sent but the server
+      rejected it (typically because it expired).
+    """
+
+
+class NotAuthenticatedError(AuthenticationError):
+    """Raised when a request requires authentication but no token is set.
+
+    This means :py:meth:`~gather_your_deals.client.GYDClient.login` has
+    not been called (or no ``access_token`` was passed to the client).
+    """
+
+
+class TokenExpiredError(AuthenticationError):
+    """Raised when the server rejects the access token with a 401.
+
+    The token was present but the server did not accept it — most
+    commonly because the JWT has expired.  When no refresh token is
+    configured the SDK raises this immediately rather than attempting a
+    silent refresh.
     """
 
 

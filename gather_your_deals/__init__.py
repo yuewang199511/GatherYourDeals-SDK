@@ -23,7 +23,9 @@ from gather_your_deals.exceptions import (
     ConflictError,
     ConnectionError,
     GYDError,
+    NotAuthenticatedError,
     NotFoundError,
+    TokenExpiredError,
     ValidationError,
 )
 from gather_your_deals.models import MetaField, Receipt, TokenResponse, User
@@ -42,6 +44,8 @@ __all__ = [
     # Exceptions
     "GYDError",
     "AuthenticationError",
+    "NotAuthenticatedError",
+    "TokenExpiredError",
     "AuthorizationError",
     "NotFoundError",
     "ConflictError",
