@@ -4,6 +4,8 @@ Python SDK for the [GatherYourDeals Data API](https://github.com/yuewang199511/G
 
 Supports all exposed API endpoints: user registration, authentication with automatic token refresh, field metadata management, receipt CRUD, and admin operations.
 
+Docs guide is [GatherYourDeals SDK Documentation](https://yuewang199511.github.io/GatherYourDeals-SDK/)
+
 ## Installation
 
 ```bash
@@ -43,6 +45,9 @@ page_iter = client.receipts.list(sort_by="price", sort_order="asc")
 for r in page_iter:
     print(r.product_name, r.price)
 print(f"{page_iter.total} receipts total")
+
+# Delete a receipt
+client.receipts.delete(receipt.id)
 ```
 
 ```bash

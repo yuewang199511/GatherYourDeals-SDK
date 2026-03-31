@@ -57,7 +57,7 @@ Python
    # Get a single receipt
    r = client.receipts.get(receipt.id)
 
-   # Delete a receipt
+   # Delete a receipt — raises ReceiptNotFoundError if the id does not exist
    client.receipts.delete(receipt.id)
 
    # Current user info
