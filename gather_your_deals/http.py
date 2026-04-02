@@ -14,8 +14,8 @@ from gather_your_deals.exceptions import (
     ConflictError,
     ConnectionError,
     GYDError,
-    NotFoundError,
     NotAuthenticatedError,
+    NotFoundError,
     TokenExpiredError,
     ValidationError,
 )
