@@ -14,7 +14,9 @@ from gather_your_deals.exceptions import (
     ConflictError,
     ConnectionError,
     GYDError,
+    NotAuthenticatedError,
     NotFoundError,
+    TokenExpiredError,
     ValidationError,
 )
 
@@ -42,8 +44,13 @@ class HttpTransport:
         self._refresh_token: str | None = None
         self._on_token_refresh: Any = None  # callback set by client
 
-    def set_tokens(self, access_token: str, refresh_token: str) -> None:
-        """Store the current token pair in memory."""
+    def set_tokens(self, access_token: str, refresh_token: str | None = None) -> None:
+        """Store the current token pair in memory.
+
+        :param access_token: JWT access token.
+        :param refresh_token: Refresh token.  When omitted, automatic
+            token refresh on 401 responses is disabled.
+        """
         self._access_token = access_token
         self._refresh_token = refresh_token
 
@@ -121,6 +128,13 @@ class HttpTransport:
         :raises GYDError: On any API error response.
         """
         url = f"{self.base_url}{path}"
+
+        # Fail fast with a clear error when no token is available
+        if authenticated and not self._access_token:
+            raise NotAuthenticatedError(
+                "No access token is set. Call login() or pass access_token= to GYDClient."
+            )
+
         try:
             resp = requests.request(
                 method,
@@ -133,18 +147,29 @@ class HttpTransport:
         except requests.RequestException as exc:
             raise ConnectionError(f"Cannot reach {url}: {exc}") from exc
 
-        # Auto-refresh on 401
-        if resp.status_code == 401 and authenticated and self._try_refresh():
-            try:
-                resp = requests.request(
-                    method,
-                    url,
-                    json=json,
-                    params=params,
-                    headers=self._headers(authenticated),
-                    timeout=self.timeout,
+        # On 401: attempt silent refresh, or surface TokenExpiredError
+        if resp.status_code == 401 and authenticated:
+            if self._try_refresh():
+                try:
+                    resp = requests.request(
+                        method,
+                        url,
+                        json=json,
+                        params=params,
+                        headers=self._headers(authenticated),
+                        timeout=self.timeout,
+                    )
+                except requests.RequestException as exc:
+                    raise ConnectionError(f"Cannot reach {url}: {exc}") from exc
+            else:
+                try:
+                    body = resp.json()
+                except ValueError:
+                    body = {"error": resp.text}
+                raise TokenExpiredError(
+                    body.get("error", "Access token rejected by the server (401)."),
+                    status_code=401,
+                    response_body=body,
                 )
-            except requests.RequestException as exc:
-                raise ConnectionError(f"Cannot reach {url}: {exc}") from exc
 
         return self._handle_response(resp)

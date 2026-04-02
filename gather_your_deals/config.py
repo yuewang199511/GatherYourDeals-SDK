@@ -75,17 +75,21 @@ def get_refresh_token(path: Path | None = None) -> str | None:
 
 def save_tokens(
     access_token: str,
-    refresh_token: str,
+    refresh_token: str | None = None,
     path: Path | None = None,
 ) -> None:
-    """Store both tokens to the config file.
+    """Store tokens to the config file.
 
     :param access_token: JWT access token.
     :param refresh_token: Refresh token for obtaining new access tokens.
+        When ``None``, any existing refresh token entry is removed.
     """
     config = load_config(path)
     config["token"] = access_token
-    config["refresh_token"] = refresh_token
+    if refresh_token is not None:
+        config["refresh_token"] = refresh_token
+    else:
+        config.pop("refresh_token", None)
     save_config(config, path)
 
 

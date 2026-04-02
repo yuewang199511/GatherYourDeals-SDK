@@ -53,6 +53,13 @@ class GYDClient:
         config file path (mainly for testing).
     :param auto_persist_tokens: When ``True`` (the default), tokens
         are automatically saved to / loaded from the config file.
+    :param access_token: JWT access token to use immediately, bypassing
+        the normal login flow.  Useful in microservices where a token
+        was obtained upstream.  When provided, the config-file tokens
+        are ignored.
+    :param refresh_token: Refresh token paired with *access_token*.
+        When omitted the client will **not** auto-refresh on expiry —
+        pass this alongside *access_token* for uninterrupted operation.
 
     The client exposes the following endpoint groups as attributes:
 
@@ -70,6 +77,8 @@ class GYDClient:
         timeout: int | None = None,
         config_path: Path | None = None,
         auto_persist_tokens: bool = True,
+        access_token: str | None = None,
+        refresh_token: str | None = None,
     ):
         self._config_path = config_path
         self._auto_persist = auto_persist_tokens
@@ -84,11 +93,16 @@ class GYDClient:
         if auto_persist_tokens:
             self._transport._on_token_refresh = self._on_token_refresh
 
-        # Restore tokens from config if available
-        stored_access = cfg.get("token")
-        stored_refresh = cfg.get("refresh_token")
-        if stored_access and stored_refresh:
-            self._transport.set_tokens(stored_access, stored_refresh)
+        # Caller-supplied tokens take priority; fall back to stored tokens
+        if access_token:
+            self._transport.set_tokens(access_token, refresh_token)
+            if auto_persist_tokens:
+                save_tokens(access_token, refresh_token, config_path)
+        else:
+            stored_access = cfg.get("token")
+            stored_refresh = cfg.get("refresh_token")
+            if stored_access:
+                self._transport.set_tokens(stored_access, stored_refresh or None)
 
         # Endpoint groups
         self.users = UsersEndpoint(self._transport)
@@ -128,11 +142,12 @@ class GYDClient:
             clear_tokens(self._config_path)
         return result
 
-    def set_tokens(self, access_token: str, refresh_token: str) -> None:
+    def set_tokens(self, access_token: str, refresh_token: str | None = None) -> None:
         """Manually set tokens (e.g. loaded from external storage).
 
         :param access_token: JWT access token.
-        :param refresh_token: Refresh token.
+        :param refresh_token: Refresh token.  When omitted, auto-refresh
+            on expiry is disabled.
         """
         self._transport.set_tokens(access_token, refresh_token)
         if self._auto_persist:
